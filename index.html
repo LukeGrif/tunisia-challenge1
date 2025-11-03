@@ -369,62 +369,76 @@
     }
 
     function renderTriangle(container, arrangement, target) {
-      const {A, B, C, D, E, F} = arrangement.positions;
-      const {sums, ok} = arrangement;
+  const {A, B, C, D, E, F} = arrangement.positions;
+  const {sums, ok} = arrangement;
 
-      // SVG coordinates for points
-      const pts = {
-        A: {x: 150, y: 40},
-        B: {x: 60,  y: 200},
-        C: {x: 240, y: 200},
-        D: {x: (150 + 60)/2,  y: (40 + 200)/2},
-        F: {x: (150 + 240)/2, y: (40 + 200)/2},
-        E: {x: 150, y: 200}
-      };
+  // SVG coordinates for points
+  const pts = {
+    A: {x: 150, y: 40},
+    B: {x: 60,  y: 200},
+    C: {x: 240, y: 200},
+    D: {x: (150 + 60) / 2,  y: (40 + 200) / 2},
+    F: {x: (150 + 240) / 2, y: (40 + 200) / 2},
+    E: {x: 150, y: 200}
+  };
 
-      const sideColor = (ok) => ok ? "#22c55e" : "#f97373";
+  const sideColor = ok => ok ? "#22c55e" : "#f97373";
 
-      const svg = `
-        <svg viewBox="0 0 300 230">
-          <!-- triangle sides -->
-          <line x1="${pts.A.x}" y1="${pts.A.y}" x2="${pts.B.x}" y2="${pts.B.y}"
-                stroke="${sideColor(ok.left)}" stroke-width="3" />
-          <line x1="${pts.B.x}" y1="${pts.B.y}" x2="${pts.C.x}" y2="${pts.C.y}"
-                stroke="${sideColor(ok.bottom)}" stroke-width="3" />
-          <line x1="${pts.C.x}" y1="${pts.C.y}" x2="${pts.A.x}" y2="${pts.A.y}"
-                stroke="${sideColor(ok.right)}" stroke-width="3" />
+  const svg = `
+    <svg viewBox="0 0 300 230">
+      <!-- triangle sides -->
+      <line x1="${pts.A.x}" y1="${pts.A.y}" x2="${pts.B.x}" y2="${pts.B.y}"
+            stroke="${sideColor(ok.left)}" stroke-width="3" />
+      <line x1="${pts.B.x}" y1="${pts.B.y}" x2="${pts.C.x}" y2="${pts.C.y}"
+            stroke="${sideColor(ok.bottom)}" stroke-width="3" />
+      <line x1="${pts.C.x}" y1="${pts.C.y}" x2="${pts.A.x}" y2="${pts.A.y}"
+            stroke="${sideColor(ok.right)}" stroke-width="3" />
 
-          <!-- nodes -->
-          ${["A","B","C","D","E","F"].map(id => {
-            const p = pts[id];
-            return `
-              <circle cx="${p.x}" cy="${p.y}" r="12" fill="#020617" stroke="#38bdf8" stroke-width="2"/>
-            `;
-          }).join("")}
+      <!-- nodes -->
+      ${["A","B","C","D","E","F"].map(id => {
+        const p = pts[id];
+        return `
+          <circle cx="${p.x}" cy="${p.y}" r="12"
+                  fill="#020617" stroke="#38bdf8" stroke-width="2"/>
+        `;
+      }).join("")}
 
-          <!-- numbers -->
-          <text x="${pts.A.x}" y="${pts.A.y + 4}" text-anchor="middle" class="node-label">${A}</text>
-          <text x="${pts.B.x}" y="${pts.B.y + 4}" text-anchor="middle" class="node-label">${B}</text>
-          <text x="${pts.C.x}" y="${pts.C.y + 4}" text-anchor="middle" class="node-label">${C}</text>
-          <text x="${pts.D.x}" y="${pts.D.y + 4}" text-anchor="middle" class="node-label">${D}</text>
-          <text x="${pts.E.x}" y="${pts.E.y + 4}" text-anchor="middle" class="node-label">${E}</text>
-          <text x="${pts.F.x}" y="${pts.F.y + 4}" text-anchor="middle" class="node-label">${F}</text>
+      <!-- numbers (slightly offset vertically so they sit nicely inside) -->
+      <text x="${pts.A.x}" y="${pts.A.y + 4}" text-anchor="middle" class="node-label">${A}</text>
+      <text x="${pts.B.x}" y="${pts.B.y + 4}" text-anchor="middle" class="node-label">${B}</text>
+      <text x="${pts.C.x}" y="${pts.C.y + 4}" text-anchor="middle" class="node-label">${C}</text>
+      <text x="${pts.D.x}" y="${pts.D.y + 4}" text-anchor="middle" class="node-label">${D}</text>
+      <text x="${pts.E.x}" y="${pts.E.y + 4}" text-anchor="middle" class="node-label">${E}</text>
+      <text x="${pts.F.x}" y="${pts.F.y + 4}" text-anchor="middle" class="node-label">${F}</text>
 
-          <!-- side labels -->
-          <text x="${(pts.A.x + pts.B.x)/2 - 20}" y="${(pts.A.y + pts.B.y)/2}" class="side-label">
-            ${sums.left} ${ok.left ? "✓" : "✗"}
-          </text>
-          <text x="${(pts.B.x + pts.C.x)/2}" y="${pts.B.y + 18}" text-anchor="middle" class="side-label">
-            ${sums.bottom} ${ok.bottom ? "✓" : "✗"}
-          </text>
-          <text x="${(pts.C.x + pts.A.x)/2 + 20}" y="${(pts.C.y + pts.A.y)/2}" class="side-label">
-            ${sums.right} ${ok.right ? "✓" : "✗"}
-          </text>
-        </svg>
-      `;
+      <!-- side labels (moved further away to avoid overlap) -->
+      <!-- Left side label: moved left and slightly up -->
+      <text x="${(pts.A.x + pts.B.x) / 2 - 45}"
+            y="${(pts.A.y + pts.B.y) / 2 - 5}"
+            class="side-label">
+        ${sums.left} ${ok.left ? "✓" : "✗"}
+      </text>
 
-      container.innerHTML = svg;
-    }
+      <!-- Bottom side label: moved below the bottom edge -->
+      <text x="${(pts.B.x + pts.C.x) / 2}"
+            y="${pts.B.y + 30}"
+            text-anchor="middle"
+            class="side-label">
+        ${sums.bottom} ${ok.bottom ? "✓" : "✗"}
+      </text>
+
+      <!-- Right side label: moved right and slightly up -->
+      <text x="${(pts.C.x + pts.A.x) / 2 + 45}"
+            y="${(pts.C.y + pts.A.y) / 2 - 5}"
+            class="side-label">
+        ${sums.right} ${ok.right ? "✓" : "✗"}
+      </text>
+    </svg>
+  `;
+
+  container.innerHTML = svg;
+}
+
 
     function renderDetails(container, arrangement, target, bestScore, countBest) {
       const {positions, sums, ok, score} = arrangement;
