@@ -1,58 +1,53 @@
 from itertools import permutations
+from time import perf_counter
 
-def score_arrangement(A, B, C, D, E, F, target_sum):
-    # Sums for each side
-    left_sum   = A + D + B      # left side
-    bottom_sum = B + E + C      # bottom (horizontal)
-    right_sum  = C + F + A      # right side
+def check_triangle(A, B, C, D, E, F, target_sum):
+    """
+    Map matches the JS solver:
+      A = v1 (top)
+      B = v2 (bottom-left)
+      C = v3 (bottom-right)
+      D = e12 (between v1–v2)
+      E = e23 (between v2–v3)
+      F = e31 (between v3–v1)
+    Side sums:
+      left   = A + D + B
+      bottom = B + E + C
+      right  = C + F + A
+    """
+    left_sum   = A + D + B
+    bottom_sum = B + E + C
+    right_sum  = C + F + A
 
-    left_ok   = (left_sum == target_sum)
-    bottom_ok = (bottom_sum == target_sum)
-    right_ok  = (right_sum == target_sum)
+    all_ok = (
+        left_sum == target_sum and
+        bottom_sum == target_sum and
+        right_sum == target_sum
+    )
 
-    score = 0
-    if bottom_ok:
-        score += 20
-    if left_ok:
-        score += 40
-    if right_ok:
-        score += 40
-
-    return score, {
+    return all_ok, {
         "left": left_sum,
         "bottom": bottom_sum,
-        "right": right_sum
-    }, {
-        "left": left_ok,
-        "bottom": bottom_ok,
-        "right": right_ok
+        "right": right_sum,
     }
 
-def find_best_arrangements(nums, target_sum):
-    best_score = -1
-    best_arrangements = []
+def solve_triangle(target_sum):
+    """
+    Search all permutations of length 6 from numbers 1..10
+    and return every arrangement where all three sides equal target_sum.
+    """
+    numbers = range(1, 11)  # 1..10
+    solutions = []
 
-    for perm in permutations(nums):
-        A, B, C, D, E, F = perm
-        score, sums, ok = score_arrangement(A, B, C, D, E, F, target_sum)
-
-        if score > best_score:
-            best_score = score
-            best_arrangements = [{
+    for A, B, C, D, E, F in permutations(numbers, 6):
+        ok, sums = check_triangle(A, B, C, D, E, F, target_sum)
+        if ok:
+            solutions.append({
                 "positions": {"A": A, "B": B, "C": C, "D": D, "E": E, "F": F},
-                "score": score,
                 "sums": sums,
-                "ok": ok
-            }]
-        elif score == best_score:
-            best_arrangements.append({
-                "positions": {"A": A, "B": B, "C": C, "D": D, "E": E, "F": F},
-                "score": score,
-                "sums": sums,
-                "ok": ok
             })
 
-    return best_score, best_arrangements
+    return solutions
 
 def draw_triangle(positions):
     """ASCII-art view of the triangle with numbers in place."""
@@ -63,50 +58,46 @@ def draw_triangle(positions):
     E = positions["E"]
     F = positions["F"]
 
-    print("Visual layout (as you should place the pieces):")
     print()
-    print(f"             ({A})")
+    print(f"             ({A})      v1 / A")
     print("            /   \\")
-    print(f"         ({D})   ({F})")
+    print(f"         ({D})   ({F})   e12 / D, e31 / F")
     print("          /         \\")
-    print(f"       ({B})---({E})---({C})")
+    print(f"       ({B})---({E})---({C})   v2 / B, e23 / E, v3 / C")
     print()
-
-def print_instructions(arrangement, target_sum):
-    pos = arrangement["positions"]
-    sums = arrangement["sums"]
-    ok = arrangement["ok"]
-    score = arrangement["score"]
-
-    print(f"Total score for this arrangement: {score} points\n")
-
-
-    # Visual triangle
-    draw_triangle(pos)
-
-    if score == 100:
-        print(f"\n✅ Perfect triangle! All three sides equal the target {target_sum}.")
-    elif score > 0:
-        print(f"\nℹ This arrangement does NOT get all three sides correct,")
-        print("  but it maximizes the score according to the rules.")
-    else:
-        print("\n⚠ No side reaches the target sum in this arrangement.")
 
 # ---------- MAIN PROGRAM ----------
 
-nums = [int(x) for x in input("Enter 6 piece numbers separated by spaces: ").split()]
+def main():
+    try:
+        target = int(input("Enter target edge sum N: "))
+    except ValueError:
+        print("Please enter a valid integer for N.")
+        return
 
-if len(nums) != 6:
-    print("Please enter exactly 6 numbers.")
-else:
-    target = int(input("Enter target edge sum N: "))
+    print(f"\nSearching all permutations of length 6 from numbers 1..10 for N = {target}…")
+    t0 = perf_counter()
+    solutions = solve_triangle(target)
+    elapsed_ms = (perf_counter() - t0) * 1000
 
-    best_score, best_arrangements = find_best_arrangements(nums, target)
+    count = len(solutions)
+    print(f"\nFound {count} solution(s) for N = {target} in {elapsed_ms:.1f} ms.\n")
 
-    if best_score <= 0:
-        print(f"\nNo arrangement gives any correct side for target {target}.")
-    else:
-        print(f"\nBest possible score with these pieces and target {target}: {best_score} points\n")
-        # Show the first best arrangement with visual triangle
-        print_instructions(best_arrangements[0], target)
-        # If there are multiple best arrangements, you could also show others if you want.
+    if count == 0:
+        print("No valid triangle arrangements for this N.")
+        return
+
+    # Print all solutions (you can limit if it’s too many)
+    for idx, sol in enumerate(solutions, start=1):
+        pos = sol["positions"]
+        sums = sol["sums"]
+
+        print(f"Solution {idx}:")
+        print(f"  (A, B, C, D, E, F) = "
+              f"({pos['A']}, {pos['B']}, {pos['C']}, {pos['D']}, {pos['E']}, {pos['F']})")
+        print(f"  Side sums: left={sums['left']}, bottom={sums['bottom']}, right={sums['right']}")
+        draw_triangle(pos)
+        print("-" * 60)
+
+if __name__ == "__main__":
+    main()

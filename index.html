@@ -1,528 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Triangle Sum Solver</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    :root {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      background: #0f172a;
-      color: #e5e7eb;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-    }
-
-    .app {
-      margin: 2rem;
-      padding: 1.5rem;
-      max-width: 900px;
-      width: 100%;
-      background: #020617;
-      border-radius: 1rem;
-      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-    }
-
-    h1 {
-      margin-top: 0;
-      font-size: 1.7rem;
-      color: #e2e8f0;
-    }
-
-    p {
-      color: #9ca3af;
-      font-size: 0.9rem;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.75rem;
-      margin-top: 1rem;
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      font-size: 0.85rem;
-    }
-
-    label {
-      color: #cbd5f5;
-    }
-
-    input[type="number"] {
-      padding: 0.4rem 0.6rem;
-      border-radius: 0.5rem;
-      border: 1px solid #334155;
-      background: #020617;
-      color: #e5e7eb;
-      font-size: 0.9rem;
-      outline: none;
-    }
-
-    input[type="number"]:focus {
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.5);
-    }
-
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      align-items: flex-end;
-      margin-top: 1rem;
-    }
-
-    button {
-      padding: 0.6rem 1.2rem;
-      border-radius: 999px;
-      border: none;
-      background: linear-gradient(to right, #0ea5e9, #6366f1);
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.95rem;
-      box-shadow: 0 8px 20px rgba(56, 189, 248, 0.3);
-      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.1s;
-    }
-
-    button:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.05);
-      box-shadow: 0 12px 25px rgba(56, 189, 248, 0.4);
-    }
-
-    button:active {
-      transform: translateY(1px);
-      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-      gap: 1.5rem;
-      margin-top: 1.5rem;
-    }
-
-    .card {
-      border-radius: 0.9rem;
-      padding: 1rem;
-      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 55%),
-                  radial-gradient(circle at bottom right, rgba(129, 140, 248, 0.14), transparent 55%),
-                  #020617;
-      border: 1px solid rgba(148, 163, 184, 0.25);
-    }
-
-    .card h2 {
-      margin-top: 0;
-      font-size: 1rem;
-      color: #e5e7eb;
-    }
-
-    .status {
-      margin-top: 0.4rem;
-      font-size: 0.85rem;
-    }
-
-    .status span.bad {
-      color: #f97373;
-    }
-
-    .status span.good {
-      color: #4ade80;
-    }
-
-    .summary {
-      font-size: 0.85rem;
-      margin-top: 0.75rem;
-      line-height: 1.4;
-    }
-
-    .summary code {
-      background: #020617;
-      padding: 0.1rem 0.3rem;
-      border-radius: 0.3rem;
-      font-size: 0.8rem;
-      border: 1px solid #1e293b;
-    }
-
-    .instructions {
-      font-size: 0.85rem;
-      margin-top: 0.75rem;
-    }
-
-    .instructions ul {
-      padding-left: 1.1rem;
-      margin: 0.3rem 0 0;
-    }
-
-    .instructions li {
-      margin-bottom: 0.2rem;
-    }
-
-    .muted {
-      color: #9ca3af;
-      font-size: 0.85rem;
-      margin-top: 0.25rem;
-    }
-
-    svg {
-      width: 100%;
-      height: auto;
-    }
-
-    .side-label {
-      font-size: 0.7rem;
-      fill: #9ca3af;
-    }
-
-    .node-label {
-      font-size: 0.9rem;
-      fill: #e5e7eb;
-      font-weight: 600;
-    }
-
-    .score-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      padding: 0.2rem 0.7rem;
-      border-radius: 999px;
-      background: rgba(56, 189, 248, 0.08);
-      border: 1px solid rgba(56, 189, 248, 0.5);
-      font-size: 0.8rem;
-      margin-top: 0.4rem;
-    }
-
-    .score-badge span {
-      font-weight: 600;
-      color: #e0f2fe;
-    }
-
-    .note {
-      font-size: 0.8rem;
-      color: #9ca3af;
-      margin-top: 0.5rem;
-    }
-
-    .error {
-      color: #f97373;
-      font-size: 0.85rem;
-      margin-top: 0.5rem;
-    }
-
-    @media (max-width: 800px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <title>Triangle Sum Solver (1..10)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Interactive triangle sum solver using distinct numbers from 1 to 10. Explore all valid arrangements where each side sums to the same target N."
+  />
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
+
 <body>
-  <div class="app">
-    <h1>Triangle Sum Solver</h1>
-    <p>Enter the 6 piece numbers and the target value <strong>N</strong>. The app finds the best-scoring triangle and shows you where to place each piece.</p>
+  <main class="app" aria-labelledby="page-title">
+    <header>
+      <h1 id="page-title">Triangle Sum Solver (uses numbers 1..10)</h1>
+      <p>
+        We place six distinct numbers chosen from <strong>1..10</strong> into the triangle
+        (three vertices and three edge middles) so that each side adds up to the same target
+        <strong>N</strong>. This tool finds <em>all</em> valid arrangements.
+      </p>
+    </header>
 
-    <div class="grid">
-      <div class="field">
-        <label for="n1">Piece 1</label>
-        <input type="number" id="n1" value="7">
-      </div>
-      <div class="field">
-        <label for="n2">Piece 2</label>
-        <input type="number" id="n2" value="2">
-      </div>
-      <div class="field">
-        <label for="n3">Piece 3</label>
-        <input type="number" id="n3" value="1">
-      </div>
-      <div class="field">
-        <label for="n4">Piece 4</label>
-        <input type="number" id="n4" value="8">
-      </div>
-      <div class="field">
-        <label for="n5">Piece 5</label>
-        <input type="number" id="n5" value="1">
-      </div>
-      <div class="field">
-        <label for="n6">Piece 6</label>
-        <input type="number" id="n6" value="2">
-      </div>
-    </div>
-
-    <div class="controls">
+    <section class="controls" aria-label="Solver controls">
       <div class="field">
         <label for="target">Target sum N</label>
-        <input type="number" id="target" value="11">
+        <input
+          type="number"
+          id="target"
+          name="target"
+          inputmode="numeric"
+          placeholder="e.g., 18"
+          aria-describedby="target-help"
+        />
+        <span id="target-help" class="muted small">
+          Choose a target side sum; common valid values are often between 15 and 21.
+        </span>
       </div>
-      <button id="solveBtn">Compute Best Triangle</button>
-    </div>
+      <button id="solveBtn" type="button">Find Solutions</button>
+      <button id="randomBtn" type="button" title="Try a plausible N">
+        Try a random N
+      </button>
+    </section>
 
-    <div id="error" class="error" style="display:none;"></div>
+    <div id="error" class="error" role="alert" aria-live="polite" hidden></div>
 
     <div class="layout">
-      <div class="card">
-        <h2>Triangle layout</h2>
-        <div id="triangleContainer">
-          <p class="muted">Fill in the numbers and click <strong>Compute Best Triangle</strong> to see the layout.</p>
+      <section class="card" aria-label="Solutions">
+        <div class="solutions-header">
+          <h2>Solutions</h2>
+          <div class="pager" id="pager" hidden>
+            <button id="prevBtn" type="button" aria-label="Previous page">◀ Prev</button>
+            <span id="pageInfo" class="small" aria-live="polite"></span>
+            <button id="nextBtn" type="button" aria-label="Next page">Next ▶</button>
+          </div>
         </div>
-        <p class="note">
-          Orientation: bottom edge is the horizontal line on the board.
+
+        <p id="summary" class="small muted">
+          Enter N and click <strong>Find Solutions</strong>.
         </p>
-      </div>
 
-      <div class="card">
-        <h2>Details & Instructions</h2>
-        <div id="details">
-          <p class="muted">Results will appear here.</p>
-        </div>
-      </div>
-    </div>
-  </div>
+        <div id="solutions" class="grid-solutions" aria-live="polite"></div>
+      </section>
 
-  <script>
-    const POSITION_NAMES = {
-      A: "Top corner",
-      B: "Bottom-left corner",
-      C: "Bottom-right corner",
-      D: "Middle of left side (between top & bottom-left)",
-      E: "Middle of bottom side (between bottom-left & bottom-right)",
-      F: "Middle of right side (between bottom-right & top)"
-    };
-
-    function permutations(arr) {
-      const res = [];
-      function backtrack(path, used) {
-        if (path.length === arr.length) {
-          res.push(path.slice());
-          return;
-        }
-        for (let i = 0; i < arr.length; i++) {
-          if (used[i]) continue;
-          used[i] = true;
-          path.push(arr[i]);
-          backtrack(path, used);
-          path.pop();
-          used[i] = false;
-        }
-      }
-      backtrack([], Array(arr.length).fill(false));
-      return res;
-    }
-
-    function scoreArrangement(A, B, C, D, E, F, target) {
-      const leftSum   = A + D + B;
-      const bottomSum = B + E + C;
-      const rightSum  = C + F + A;
-
-      const leftOk   = (leftSum === target);
-      const bottomOk = (bottomSum === target);
-      const rightOk  = (rightSum === target);
-
-      let score = 0;
-      if (bottomOk) score += 20;
-      if (leftOk)   score += 40;
-      if (rightOk)  score += 40;
-
-      return {
-        score,
-        sums: { left: leftSum, bottom: bottomSum, right: rightSum },
-        ok:   { left: leftOk, bottom: bottomOk, right: rightOk }
-      };
-    }
-
-    function findBestArrangements(nums, target) {
-      const perms = permutations(nums);
-      let bestScore = -1;
-      const best = [];
-
-      for (const p of perms) {
-        const [A, B, C, D, E, F] = p;
-        const eval = scoreArrangement(A, B, C, D, E, F, target);
-
-        if (eval.score > bestScore) {
-          bestScore = eval.score;
-          best.length = 0;
-          best.push({
-            positions: {A, B, C, D, E, F},
-            ...eval
-          });
-        } else if (eval.score === bestScore) {
-          best.push({
-            positions: {A, B, C, D, E, F},
-            ...eval
-          });
-        }
-      }
-
-      return { bestScore, best };
-    }
-
-    function renderTriangle(container, arrangement, target) {
-  const {A, B, C, D, E, F} = arrangement.positions;
-  const {sums, ok} = arrangement;
-
-  // SVG coordinates for points
-  const pts = {
-    A: {x: 150, y: 40},
-    B: {x: 60,  y: 200},
-    C: {x: 240, y: 200},
-    D: {x: (150 + 60) / 2,  y: (40 + 200) / 2},
-    F: {x: (150 + 240) / 2, y: (40 + 200) / 2},
-    E: {x: 150, y: 200}
-  };
-
-  const sideColor = ok => ok ? "#22c55e" : "#f97373";
-
-  const svg = `
-    <svg viewBox="0 0 300 230">
-      <!-- triangle sides -->
-      <line x1="${pts.A.x}" y1="${pts.A.y}" x2="${pts.B.x}" y2="${pts.B.y}"
-            stroke="${sideColor(ok.left)}" stroke-width="3" />
-      <line x1="${pts.B.x}" y1="${pts.B.y}" x2="${pts.C.x}" y2="${pts.C.y}"
-            stroke="${sideColor(ok.bottom)}" stroke-width="3" />
-      <line x1="${pts.C.x}" y1="${pts.C.y}" x2="${pts.A.x}" y2="${pts.A.y}"
-            stroke="${sideColor(ok.right)}" stroke-width="3" />
-
-      <!-- nodes -->
-      ${["A","B","C","D","E","F"].map(id => {
-        const p = pts[id];
-        return `
-          <circle cx="${p.x}" cy="${p.y}" r="12"
-                  fill="#020617" stroke="#38bdf8" stroke-width="2"/>
-        `;
-      }).join("")}
-
-      <!-- numbers (slightly offset vertically so they sit nicely inside) -->
-      <text x="${pts.A.x}" y="${pts.A.y + 4}" text-anchor="middle" class="node-label">${A}</text>
-      <text x="${pts.B.x}" y="${pts.B.y + 4}" text-anchor="middle" class="node-label">${B}</text>
-      <text x="${pts.C.x}" y="${pts.C.y + 4}" text-anchor="middle" class="node-label">${C}</text>
-      <text x="${pts.D.x}" y="${pts.D.y + 4}" text-anchor="middle" class="node-label">${D}</text>
-      <text x="${pts.E.x}" y="${pts.E.y + 4}" text-anchor="middle" class="node-label">${E}</text>
-      <text x="${pts.F.x}" y="${pts.F.y + 4}" text-anchor="middle" class="node-label">${F}</text>
-
-      <!-- side labels (moved further away to avoid overlap) -->
-      <!-- Left side label: moved left and slightly up -->
-      <text x="${(pts.A.x + pts.B.x) / 2 - 45}"
-            y="${(pts.A.y + pts.B.y) / 2 - 5}"
-            class="side-label">
-        ${sums.left} ${ok.left ? "✓" : "✗"}
-      </text>
-
-      <!-- Bottom side label: moved below the bottom edge -->
-      <text x="${(pts.B.x + pts.C.x) / 2}"
-            y="${pts.B.y + 30}"
-            text-anchor="middle"
-            class="side-label">
-        ${sums.bottom} ${ok.bottom ? "✓" : "✗"}
-      </text>
-
-      <!-- Right side label: moved right and slightly up -->
-      <text x="${(pts.C.x + pts.A.x) / 2 + 45}"
-            y="${(pts.C.y + pts.A.y) / 2 - 5}"
-            class="side-label">
-        ${sums.right} ${ok.right ? "✓" : "✗"}
-      </text>
-    </svg>
-  `;
-
-  container.innerHTML = svg;
-}
-
-
-    function renderDetails(container, arrangement, target, bestScore, countBest) {
-      const {positions, sums, ok, score} = arrangement;
-      const linesHtml = `
-        <div class="score-badge">
-          Score: <span>${score}</span> / 100
-          <span>• Target N = ${target}</span>
-        </div>
-        <p class="status">
-          Left side (A–D–B): <span class="${ok.left ? "good" : "bad"}">
-            ${positions.A} + ${positions.D} + ${positions.B} = ${sums.left} ${ok.left ? "✓" : "✗"}
-          </span><br>
-          Bottom side (B–E–C): <span class="${ok.bottom ? "good" : "bad"}">
-            ${positions.B} + ${positions.E} + ${positions.C} = ${sums.bottom} ${ok.bottom ? "✓" : "✗"}
-          </span><br>
-          Right side (C–F–A): <span class="${ok.right ? "good" : "bad"}">
-            ${positions.C} + ${positions.F} + ${positions.A} = ${sums.right} ${ok.right ? "✓" : "✗"}
-          </span>
-        </p>
-      `;
-
-      const instructionsHtml = `
-        <div class="instructions">
-          <strong>Place the pieces like this:</strong>
-          <ul>
-            <li>${POSITION_NAMES.A}: <code>${positions.A}</code></li>
-            <li>${POSITION_NAMES.B}: <code>${positions.B}</code></li>
-            <li>${POSITION_NAMES.C}: <code>${positions.C}</code></li>
-            <li>${POSITION_NAMES.D}: <code>${positions.D}</code></li>
-            <li>${POSITION_NAMES.E}: <code>${positions.E}</code></li>
-            <li>${POSITION_NAMES.F}: <code>${positions.F}</code></li>
+      <aside class="card" aria-label="Details and notes">
+        <h2>Details &amp; Notes</h2>
+        <div class="details">
+          <p class="muted">
+            Mapping of positions (matches your original Python code):
+          </p>
+          <ul class="muted">
+            <li><strong>v1, v2, v3</strong> = vertices</li>
+            <li><strong>e12</strong> = edge between v1–v2</li>
+            <li><strong>e23</strong> = edge between v2–v3</li>
+            <li><strong>e31</strong> = edge between v3–v1</li>
           </ul>
+          <p class="muted">
+            Each side sum:
+            <br />
+            <kbd>v1 + e12 + v2</kbd>,
+            <kbd>v2 + e23 + v3</kbd>,
+            <kbd>v3 + e31 + v1</kbd>
+          </p>
+          <p class="muted">
+            Logic:
+            we iterate all permutations of length 6 from <kbd>1..10</kbd> and collect those
+            that satisfy all three equalities.
+          </p>
+          <p class="pill">Tip: try N between 15 and 21 for interesting results.</p>
         </div>
-      `;
+      </aside>
+    </div>
+  </main>
 
-      let note;
-      if (score === 100) {
-        note = `<p class="summary">✅ Perfect triangle: all three sides equal <code>${target}</code>. Any rotated/flipped version that still keeps each physical line summing to ${target} will also score 100.</p>`;
-      } else if (score > 0) {
-        note = `<p class="summary">ℹ No perfect triangle with these pieces, but this arrangement gives the maximum possible score of <strong>${score}</strong>. There are <strong>${countBest}</strong> arrangement(s) with this score.</p>`;
-      } else {
-        note = `<p class="summary">⚠ With these pieces and target <code>${target}</code>, no side can be made to sum to N. Score = 0.</p>`;
-      }
-
-      container.innerHTML = linesHtml + instructionsHtml + note;
-    }
-
-    document.getElementById("solveBtn").addEventListener("click", () => {
-      const nums = [];
-      for (let i = 1; i <= 6; i++) {
-        const val = Number(document.getElementById("n" + i).value);
-        if (isNaN(val)) {
-          document.getElementById("error").textContent = "Please enter 6 valid numbers.";
-          document.getElementById("error").style.display = "block";
-          return;
-        }
-        nums.push(val);
-      }
-
-      const target = Number(document.getElementById("target").value);
-      if (isNaN(target)) {
-        document.getElementById("error").textContent = "Please enter a valid target sum N.";
-        document.getElementById("error").style.display = "block";
-        return;
-      }
-
-      document.getElementById("error").style.display = "none";
-
-      const {bestScore, best} = findBestArrangements(nums, target);
-      const triangleContainer = document.getElementById("triangleContainer");
-      const detailsContainer = document.getElementById("details");
-
-      if (bestScore <= 0) {
-        triangleContainer.innerHTML = `<p class="muted">No arrangement scores any points for target N = <strong>${target}</strong>.</p>`;
-        detailsContainer.innerHTML = `<p class="summary">Try changing the target value or piece numbers. For this combination, no side can be made to equal N.</p>`;
-        return;
-      }
-
-      // Take the first best arrangement
-      const arrangement = best[0];
-
-      renderTriangle(triangleContainer, arrangement, target);
-      renderDetails(detailsContainer, arrangement, target, bestScore, best.length);
-    });
-  </script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
