@@ -18,6 +18,7 @@ let prevBtn;
 let nextBtn;
 let pageInfo;
 let targetEl;
+let excludeEl;
 
 /**
  * Colour for an edge based on whether it meets the target sum.
@@ -25,11 +26,19 @@ let targetEl;
  * @returns {string}
  */
 function sideColor(ok) {
-  return ok ? "#22c55e" : "#f97373";
+  return ok ? "#22c55e" : "#f97373"; // green when OK, reddish if not
 }
 
 /**
  * Generate SVG markup representing a triangle solution.
+ *
+ * Positions:
+ *   v1 = top vertex
+ *   v2 = bottom-left vertex
+ *   v3 = bottom-right vertex
+ *   e12 = midpoint of side v1–v2
+ *   e23 = midpoint of side v2–v3
+ *   e31 = midpoint of side v3–v1
  */
 function triangleSVG(v1, v2, v3, e12, e23, e31, N) {
   const A = v1;
@@ -51,6 +60,7 @@ function triangleSVG(v1, v2, v3, e12, e23, e31, N) {
     right: sums.right === N
   };
 
+  // Coordinates
   const pts = {
     A: { x: 150, y: 40 },
     B: { x: 60, y: 200 },
@@ -62,6 +72,7 @@ function triangleSVG(v1, v2, v3, e12, e23, e31, N) {
 
   return `
 <svg viewBox="0 0 300 230" role="img" aria-label="Triangle solution">
+  <!-- Sides -->
   <line x1="${pts.A.x}" y1="${pts.A.y}" x2="${pts.B.x}" y2="${pts.B.y}" stroke="${sideColor(
     ok.left
   )}" stroke-width="3" />
@@ -72,13 +83,15 @@ function triangleSVG(v1, v2, v3, e12, e23, e31, N) {
     ok.right
   )}" stroke-width="3" />
 
+  <!-- Nodes (pale yellow fill, green border) -->
   ${["A", "B", "C", "D", "E", "F"]
     .map((id) => {
       const p = pts[id];
-      return `<circle cx="${p.x}" cy="${p.y}" r="12" fill="#020617" stroke="#38bdf8" stroke-width="2" />`;
+      return `<circle cx="${p.x}" cy="${p.y}" r="12" fill="#fef9c3" stroke="#22c55e" stroke-width="2" />`;
     })
     .join("")}
 
+  <!-- Numbers at positions -->
   <text x="${pts.A.x}" y="${pts.A.y + 4}" text-anchor="middle" class="node-label">${A}</text>
   <text x="${pts.B.x}" y="${pts.B.y + 4}" text-anchor="middle" class="node-label">${B}</text>
   <text x="${pts.C.x}" y="${pts.C.y + 4}" text-anchor="middle" class="node-label">${C}</text>
@@ -86,6 +99,7 @@ function triangleSVG(v1, v2, v3, e12, e23, e31, N) {
   <text x="${pts.E.x}" y="${pts.E.y + 4}" text-anchor="middle" class="node-label">${E}</text>
   <text x="${pts.F.x}" y="${pts.F.y + 4}" text-anchor="middle" class="node-label">${F}</text>
 
+  <!-- Side sums -->
   <text x="${(pts.A.x + pts.B.x) / 2 - 45}" y="${
     (pts.A.y + pts.B.y) / 2 - 5
   }" class="side-label">
@@ -153,9 +167,11 @@ function renderPage(page) {
 
 /**
  * Run the solver and update the UI.
+ * Supports excluding multiple numbers via space-separated input.
  */
 function solveAndRender() {
   const raw = targetEl.value.trim();
+  const rawExclude = excludeEl.value.trim();
 
   if (raw === "") {
     errorEl.textContent = "Please enter a target sum N.";
@@ -173,25 +189,61 @@ function solveAndRender() {
     return;
   }
 
+  // Parse space-separated excluded numbers
+  let excludeList = [];
+  if (rawExclude !== "") {
+    const tokens = rawExclude.split(/\s+/).filter(Boolean);
+    const parsed = [];
+
+    for (const t of tokens) {
+      const ex = Number(t);
+      if (
+        !Number.isFinite(ex) ||
+        !Number.isInteger(ex) ||
+        ex < 1 ||
+        ex > 10
+      ) {
+        errorEl.textContent =
+          `Each excluded value must be an integer between 1 and 10. Problem value: "${t}".`;
+        errorEl.hidden = false;
+        return;
+      }
+      if (!parsed.includes(ex)) {
+        parsed.push(ex);
+      }
+    }
+
+    excludeList = parsed;
+  }
+
   errorEl.hidden = true;
-  summaryEl.textContent = "Searching all permutations of length 6 from 1..10…";
+
+  const excludeMsg =
+    excludeList.length === 0
+      ? ""
+      : ` excluding ${excludeList.join(", ")}`;
+
+  summaryEl.textContent =
+    excludeList.length === 0
+      ? "Searching all permutations of length 6 from 1..10…"
+      : `Searching permutations of length 6 from 1..10${excludeMsg}…`;
 
   const t0 = performance.now();
-  const solutions = solveTriangle(N);
+  const solutions = solveTriangle(N, excludeList);
   const elapsedMs = Math.max(1, Math.round(performance.now() - t0));
 
   state.currentSolutions = solutions;
   state.currentN = N;
 
   if (solutions.length === 0) {
-    solutionsEl.innerHTML = `<p class="muted">No solutions found for N = <strong>${N}</strong>.</p>`;
-    summaryEl.innerHTML = `0 solutions • N = <strong>${N}</strong> • ${elapsedMs} ms`;
+    solutionsEl.innerHTML = `<p class="muted">No solutions found for N = <strong>${N}</strong>${excludeMsg}.</p>`;
+    summaryEl.innerHTML = `0 solutions • N = <strong>${N}</strong>${excludeMsg} • ${elapsedMs} ms`;
     pagerEl.hidden = true;
     pageInfo.textContent = "";
     return;
   }
 
-  summaryEl.innerHTML = `<strong>${solutions.length}</strong> solutions • N = <strong>${N}</strong> • ${elapsedMs} ms`;
+  summaryEl.innerHTML = `<strong>${solutions.length}</strong> solutions • N = <strong>${N}</strong>${excludeMsg} • ${elapsedMs} ms`;
   renderPage(1);
 }
 
@@ -207,6 +259,7 @@ function init() {
   nextBtn = document.getElementById("nextBtn");
   pageInfo = document.getElementById("pageInfo");
   targetEl = document.getElementById("target");
+  excludeEl = document.getElementById("exclude");
 
   const solveBtn = document.getElementById("solveBtn");
   const randomBtn = document.getElementById("randomBtn");
@@ -232,8 +285,14 @@ function init() {
     }
   });
 
-  // Optional: allow Enter key to trigger solve
+  // Allow Enter key to trigger solve from both inputs
   targetEl.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      solveAndRender();
+    }
+  });
+
+  excludeEl.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       solveAndRender();
     }

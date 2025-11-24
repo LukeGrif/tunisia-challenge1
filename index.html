@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Triangle Sum Solver (1..10)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta
-    name="description"
-    content="Interactive triangle sum solver using distinct numbers from 1 to 10. Explore all valid arrangements where each side sums to the same target N."
-  />
+  <meta name="description"
+    content="Interactive triangle sum solver using distinct numbers from 1 to 10. Explore all valid arrangements where each side sums to the same target N." />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 
@@ -18,25 +17,30 @@
       <p>
         We place six distinct numbers chosen from <strong>1..10</strong> into the triangle
         (three vertices and three edge middles) so that each side adds up to the same target
-        <strong>N</strong>. This tool finds <em>all</em> valid arrangements.
+        <strong>N</strong>. You can also optionally <strong>exclude</strong> one number
+        (e.g. find all solutions without <code>6</code>).
       </p>
     </header>
 
     <section class="controls" aria-label="Solver controls">
       <div class="field">
         <label for="target">Target sum N</label>
-        <input
-          type="number"
-          id="target"
-          name="target"
-          inputmode="numeric"
-          placeholder="e.g., 18"
-          aria-describedby="target-help"
-        />
+        <input type="number" id="target" name="target" inputmode="numeric" placeholder="e.g., 18"
+          aria-describedby="target-help" />
         <span id="target-help" class="muted small">
           Choose a target side sum; common valid values are often between 15 and 21.
         </span>
       </div>
+
+      <div class="field">
+        <label for="exclude">Exclude numbers (optional)</label>
+        <input type="text" id="exclude" name="exclude" placeholder="e.g., 6 7 9" aria-describedby="exclude-help" />
+        <span id="exclude-help" class="muted small">
+          Enter one or more numbers between 1 and 10, separated by spaces.
+        </span>
+      </div>
+
+
       <button id="solveBtn" type="button">Find Solutions</button>
       <button id="randomBtn" type="button" title="Try a plausible N">
         Try a random N
@@ -67,7 +71,7 @@
         <h2>Details &amp; Notes</h2>
         <div class="details">
           <p class="muted">
-            Mapping of positions (matches your original Python code):
+            Mapping of positions:
           </p>
           <ul class="muted">
             <li><strong>v1, v2, v3</strong> = vertices</li>
@@ -85,7 +89,8 @@
           <p class="muted">
             Logic:
             we iterate all permutations of length 6 from <kbd>1..10</kbd> and collect those
-            that satisfy all three equalities.
+            that satisfy all three equalities. You may optionally exclude one or more numbers
+            from consideration.
           </p>
           <p class="pill">Tip: try N between 15 and 21 for interesting results.</p>
         </div>
@@ -95,4 +100,5 @@
 
   <script type="module" src="js/main.js"></script>
 </body>
+
 </html>
