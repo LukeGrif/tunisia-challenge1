@@ -220,3 +220,18 @@ svg {
     grid-template-columns: 1fr;
   }
 }
+
+.logo-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+  padding: 10px;
+  background: #1e3a8a; /* deep blue */
+  border-radius: 12px;
+}
+
+.logo {
+  height: 80px;
+  width: auto;
+  object-fit: contain;
+}

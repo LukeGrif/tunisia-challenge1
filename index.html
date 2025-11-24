@@ -1,45 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <title>Triangle Sum Solver (1..10)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description"
-    content="Interactive triangle sum solver using distinct numbers from 1 to 10. Explore all valid arrangements where each side sums to the same target N." />
+  <meta
+    name="description"
+    content="Interactive triangle sum solver using distinct numbers from 1 to 10. Explore all valid arrangements where each side sums to the same target N."
+  />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 
 <body>
   <main class="app" aria-labelledby="page-title">
+
+    <!-- Logo Section -->
+    <header class="logo-header">
+      <img src="TRSYP.png" alt="TRSYP Logo" class="logo" />
+    </header>
+
     <header>
       <h1 id="page-title">Triangle Sum Solver (uses numbers 1..10)</h1>
       <p>
         We place six distinct numbers chosen from <strong>1..10</strong> into the triangle
         (three vertices and three edge middles) so that each side adds up to the same target
-        <strong>N</strong>. You can also optionally <strong>exclude</strong> one number
-        (e.g. find all solutions without <code>6</code>).
+        <strong>N</strong>.  
+        You may optionally exclude <strong>multiple numbers</strong> from use
+        (e.g. <code>6 7 9</code>).
       </p>
     </header>
 
+    <!-- Controls -->
     <section class="controls" aria-label="Solver controls">
       <div class="field">
         <label for="target">Target sum N</label>
-        <input type="number" id="target" name="target" inputmode="numeric" placeholder="e.g., 18"
-          aria-describedby="target-help" />
+        <input
+          type="number"
+          id="target"
+          name="target"
+          inputmode="numeric"
+          placeholder="e.g., 18"
+          aria-describedby="target-help"
+        />
         <span id="target-help" class="muted small">
-          Choose a target side sum; common valid values are often between 15 and 21.
+          Choose a target side sum; commonly valid values are 15–21.
         </span>
       </div>
 
       <div class="field">
         <label for="exclude">Exclude numbers (optional)</label>
-        <input type="text" id="exclude" name="exclude" placeholder="e.g., 6 7 9" aria-describedby="exclude-help" />
+        <input
+          type="text"
+          id="exclude"
+          name="exclude"
+          placeholder="e.g., 6 7 9"
+          aria-describedby="exclude-help"
+        />
         <span id="exclude-help" class="muted small">
-          Enter one or more numbers between 1 and 10, separated by spaces.
+          Enter one or more numbers from 1–10, separated by spaces.
         </span>
       </div>
-
 
       <button id="solveBtn" type="button">Find Solutions</button>
       <button id="randomBtn" type="button" title="Try a plausible N">
@@ -47,9 +67,12 @@
       </button>
     </section>
 
+    <!-- Error Display -->
     <div id="error" class="error" role="alert" aria-live="polite" hidden></div>
 
+    <!-- Layout -->
     <div class="layout">
+      <!-- Solutions Column -->
       <section class="card" aria-label="Solutions">
         <div class="solutions-header">
           <h2>Solutions</h2>
@@ -67,31 +90,31 @@
         <div id="solutions" class="grid-solutions" aria-live="polite"></div>
       </section>
 
+      <!-- Sidebar -->
       <aside class="card" aria-label="Details and notes">
         <h2>Details &amp; Notes</h2>
         <div class="details">
-          <p class="muted">
-            Mapping of positions:
-          </p>
+          <p class="muted">Mapping of positions:</p>
           <ul class="muted">
             <li><strong>v1, v2, v3</strong> = vertices</li>
             <li><strong>e12</strong> = edge between v1–v2</li>
             <li><strong>e23</strong> = edge between v2–v3</li>
             <li><strong>e31</strong> = edge between v3–v1</li>
           </ul>
+
           <p class="muted">
-            Each side sum:
-            <br />
-            <kbd>v1 + e12 + v2</kbd>,
+            Side sums:
+            <br /><kbd>v1 + e12 + v2</kbd>,
             <kbd>v2 + e23 + v3</kbd>,
             <kbd>v3 + e31 + v1</kbd>
           </p>
+
           <p class="muted">
-            Logic:
-            we iterate all permutations of length 6 from <kbd>1..10</kbd> and collect those
-            that satisfy all three equalities. You may optionally exclude one or more numbers
-            from consideration.
+            Logic: iterates all permutations of 6 distinct numbers from 1..10
+            and keeps those satisfying all three equalities.  
+            Multiple excluded numbers can be used.
           </p>
+
           <p class="pill">Tip: try N between 15 and 21 for interesting results.</p>
         </div>
       </aside>
@@ -100,5 +123,4 @@
 
   <script type="module" src="js/main.js"></script>
 </body>
-
 </html>
